@@ -27,10 +27,6 @@ impl<'src> Scanner<'src> {
         use TokenType::*;
 
         self.skip_whitespace();
-        if self.is_at_end() {
-            return self.error_token();
-        }
-
         self.start = self.current;
         let c = self.advance();
 
@@ -57,25 +53,14 @@ impl<'src> Scanner<'src> {
             '=' => return eq_lookahead(EqualEqual, Equal),
             '>' => return eq_lookahead(GreaterEqual, Greater),
             '<' => return eq_lookahead(LesserEqual, Lesser),
-            '/' => {
-                if self.consume_eq('/') {
-                    while self.peek() != '\n' && !self.is_at_end() {
-                        self.advance();
-                    }
-                } else {
-                    return self.make_token(Slash);
-                }
-            }
             '"' => return self.string(),
             d if d.is_digit(10) => return self.number(),
             a if a.is_alphabetic() => return self.ident_and_keyword(),
-            _ => (),
-        };
-
-        todo!()
+            _ => self.error_token("Invalid token."),
+        }
     }
 
-    fn is_at_end(&self) -> bool {
+    pub fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
 
@@ -233,8 +218,12 @@ impl<'src> Scanner<'src> {
         }
     }
 
-    fn error_token(&self) -> Token {
-        todo!()
+    fn error_token(&self, message: &'static str) -> Token {
+        Token {
+            token_type: TokenType::Error,
+            lexeme: message.to_owned(),
+            line: self.line,
+        }
     }
 }
 
