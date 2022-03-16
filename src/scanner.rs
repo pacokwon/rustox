@@ -27,6 +27,11 @@ impl<'src> Scanner<'src> {
         use TokenType::*;
 
         self.skip_whitespace();
+
+        if self.is_at_end() {
+            return self.make_token(Eof);
+        }
+
         self.start = self.current;
         let c = self.advance();
 
@@ -38,24 +43,24 @@ impl<'src> Scanner<'src> {
         };
 
         match c {
-            '(' => return self.make_token(LeftParen),
-            ')' => return self.make_token(RightParen),
-            '{' => return self.make_token(LeftBrace),
-            '}' => return self.make_token(RightBrace),
-            ',' => return self.make_token(Comma),
-            '.' => return self.make_token(Dot),
-            '-' => return self.make_token(Minus),
-            '+' => return self.make_token(Plus),
-            ';' => return self.make_token(Semicolon),
-            '*' => return self.make_token(Star),
-            '/' => return self.make_token(Slash),
-            '!' => return eq_lookahead(BangEqual, Equal),
-            '=' => return eq_lookahead(EqualEqual, Equal),
-            '>' => return eq_lookahead(GreaterEqual, Greater),
-            '<' => return eq_lookahead(LesserEqual, Lesser),
-            '"' => return self.string(),
-            d if d.is_digit(10) => return self.number(),
-            a if a.is_alphabetic() => return self.ident_and_keyword(),
+            '(' => self.make_token(LeftParen),
+            ')' => self.make_token(RightParen),
+            '{' => self.make_token(LeftBrace),
+            '}' => self.make_token(RightBrace),
+            ',' => self.make_token(Comma),
+            '.' => self.make_token(Dot),
+            '-' => self.make_token(Minus),
+            '+' => self.make_token(Plus),
+            ';' => self.make_token(Semicolon),
+            '*' => self.make_token(Star),
+            '/' => self.make_token(Slash),
+            '!' => eq_lookahead(BangEqual, Equal),
+            '=' => eq_lookahead(EqualEqual, Equal),
+            '>' => eq_lookahead(GreaterEqual, Greater),
+            '<' => eq_lookahead(LesserEqual, Lesser),
+            '"' => self.string(),
+            d if d.is_digit(10) => self.number(),
+            a if a.is_alphabetic() => self.ident_and_keyword(),
             _ => self.error_token("Invalid token."),
         }
     }
