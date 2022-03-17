@@ -92,7 +92,7 @@ impl<'src> Scanner<'src> {
         if self.is_at_end() {
             None
         } else {
-            Some(self.source_vec[self.current])
+            Some(self.source_vec[self.current + 1])
         }
     }
 
