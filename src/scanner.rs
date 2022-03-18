@@ -139,12 +139,19 @@ impl<'src> Scanner<'src> {
     }
 
     fn string(&mut self) -> Token {
-        while let Some(c) = self.peek() {
-            if c == '"' {
-                break
+        loop {
+            match self.peek() {
+                Some(c) => {
+                    if c == '"' {
+                        break
+                    } else {
+                        self.advance();
+                    }
+                },
+                None => return self.error_token("Reached Eof while scanning string."),
             }
-            self.advance();
         }
+
         let token = self.make_token(TokenType::String);
         self.advance();
         token
@@ -351,6 +358,13 @@ mod tests {
         let code = "// this is a comment\n\
                     / \"this is not a comment\"";
         let expected = vec![Slash, String];
+        test_code(code, expected);
+    }
+
+    #[test]
+    fn string_eof() {
+        let code = "\"weird string";
+        let expected = vec![Error];
         test_code(code, expected);
     }
 }
