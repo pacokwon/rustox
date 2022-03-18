@@ -45,7 +45,11 @@ impl<'src> Scanner<'src> {
             self.make_token(tt)
         };
 
-        match c {
+        if c.is_none() {
+            panic!("Not at EOF, but advance() returned None.");
+        }
+
+        match c.unwrap() {
             '(' => self.make_token(LeftParen),
             ')' => self.make_token(RightParen),
             '{' => self.make_token(LeftBrace),
@@ -72,9 +76,11 @@ impl<'src> Scanner<'src> {
         self.current >= self.source.len()
     }
 
-    fn advance(&mut self) -> char {
-        let c = self.source_vec[self.current];
-        self.current += 1;
+    fn advance(&mut self) -> Option<char> {
+        let c = self.peek();
+        if c.is_some() {
+            self.current += 1;
+        }
         c
     }
 
