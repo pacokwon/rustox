@@ -135,9 +135,9 @@ impl<'src> Scanner<'src> {
             self.advance();
         }
 
-        if self.peek() == '.' {
+        if !self.is_at_end() && self.peek() == '.' {
             self.advance();
-            while self.peek().is_digit(10) {
+            while !self.is_at_end() && self.peek().is_digit(10) {
                 self.advance();
             }
         }
