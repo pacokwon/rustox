@@ -239,8 +239,86 @@ impl<'src> Scanner<'src> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use TokenType::*;
+
+    fn scan_tokens(code: &str) -> Vec<Token> {
+        let mut sc = Scanner::new(code);
+        let mut v = Vec::new();
+        while !sc.is_at_end() { v.push(sc.scan_token()) }
+        println!("{:?}", v);
+        v
+    }
+
+    fn compare(result: Vec<Token>, expected: Vec<TokenType>) {
+        assert_eq!(result.len(), expected.len());
+        let compare_tt = |tt1, tt2| match (tt1, tt2) {
+            (Number(_), Number(_)) => (),
+            (r1, r2) => assert_eq!(r1, r2),
+        };
+
+        result.into_iter().zip(expected).for_each(|(r, e)| compare_tt(r.token_type, e))
+    }
+
+    fn test_code(code: &str, expected: Vec<TokenType>) {
+        let result = scan_tokens(code);
+        compare(result, expected);
+    }
+
     #[test]
-    fn foobar() {
-        assert_eq!(3, 3);
+    fn variable() {
+        let code = "var a = 1;";
+        let expected = vec![Var, Identifier, Equal, Number(1f64), Semicolon];
+        test_code(code, expected);
+    }
+
+    #[test]
+    fn variable_long() {
+        let code = "var a = 1;\n\
+                    var b = 2;\n\
+                    print a;";
+        let expected = vec![
+            Var, Identifier, Equal, Number(1f64), Semicolon,
+            Var, Identifier, Equal, Number(2f64), Semicolon,
+            Print, Identifier, Semicolon,
+        ];
+        test_code(code, expected);
+    }
+
+    #[test]
+    fn operators() {
+        let code = "+ - * / < > = ! <= >= == !=";
+        let expected = vec![
+            Plus, Minus, Star, Slash, Lesser,
+            Greater, Equal, Bang, LesserEqual,
+            GreaterEqual, EqualEqual, BangEqual,
+        ];
+        test_code(code, expected);
+    }
+
+    #[test]
+    fn symbols() {
+        let code = "} { ) ( . , ;";
+        let expected = vec![
+            RightBrace, LeftBrace,
+            RightParen, LeftParen,
+            Dot, Comma, Semicolon,
+        ];
+        test_code(code, expected);
+    }
+
+    #[test]
+    fn literals() {
+        let code = "\"Hello World\" 3.1415";
+        let expected = vec![String, Number(3.1415)];
+        test_code(code, expected);
+    }
+
+    #[test]
+    fn comment() {
+        let code = "// this is a comment\n\
+                    / \"this is not a comment\"";
+        let expected = vec![Slash, String];
+        test_code(code, expected);
     }
 }
