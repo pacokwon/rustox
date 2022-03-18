@@ -57,7 +57,7 @@ impl<'src> Scanner<'src> {
             ';' => self.make_token(Semicolon),
             '*' => self.make_token(Star),
             '/' => self.make_token(Slash),
-            '!' => eq_lookahead(BangEqual, Equal),
+            '!' => eq_lookahead(BangEqual, Bang),
             '=' => eq_lookahead(EqualEqual, Equal),
             '>' => eq_lookahead(GreaterEqual, Greater),
             '<' => eq_lookahead(LesserEqual, Lesser),
