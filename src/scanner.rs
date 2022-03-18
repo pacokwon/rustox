@@ -79,16 +79,24 @@ impl<'src> Scanner<'src> {
     }
 
     fn consume_eq(&mut self, c: char) -> bool {
-        if self.peek() == c {
-            self.advance();
-            true
+        if let Some(p) = self.peek() {
+            if c == p {
+                self.advance();
+                true
+            } else {
+                false
+            }
         } else {
             false
         }
     }
 
-    fn peek(&self) -> char {
-        return self.source_vec[self.current];
+    fn peek(&self) -> Option<char> {
+        if self.current < self.source_vec.len() {
+            Some(self.source_vec[self.current])
+        } else {
+            None
+        }
     }
 
     fn peek_next(&self) -> Option<char> {
@@ -100,8 +108,8 @@ impl<'src> Scanner<'src> {
     }
 
     fn skip_whitespace(&mut self) {
-        while !self.is_at_end() {
-            match self.peek() {
+        while let Some(c) = self.peek() {
+            match c {
                 '\r' | ' ' | '\t' => {
                     self.advance();
                 }
@@ -110,7 +118,10 @@ impl<'src> Scanner<'src> {
                     self.line += 1;
                 },
                 '/' => if let Some('/') = self.peek_next() {
-                    while !self.is_at_end() && self.peek() != '\n' {
+                    while let Some(c) = self.peek() {
+                        if c == '\n' {
+                            break
+                        }
                         self.advance();
                     }
                 } else {
@@ -122,7 +133,10 @@ impl<'src> Scanner<'src> {
     }
 
     fn string(&mut self) -> Token {
-        while self.peek() != '"' {
+        while let Some(c) = self.peek() {
+            if c == '"' {
+                break
+            }
             self.advance();
         }
         let token = self.make_token(TokenType::String);
@@ -131,14 +145,22 @@ impl<'src> Scanner<'src> {
     }
 
     fn number(&mut self) -> Token {
-        while self.peek().is_digit(10) {
-            self.advance();
+        while let Some(c) = self.peek() {
+            if c.is_digit(10) {
+                self.advance();
+            } else {
+                break
+            }
         }
 
-        if !self.is_at_end() && self.peek() == '.' {
+        if let Some('.') = self.peek() {
             self.advance();
-            while !self.is_at_end() && self.peek().is_digit(10) {
-                self.advance();
+            while let Some(c) = self.peek() {
+                if c.is_digit(10) {
+                    self.advance();
+                } else {
+                    break
+                }
             }
         }
 
@@ -154,8 +176,12 @@ impl<'src> Scanner<'src> {
         let is_alpha = |c| ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
         let is_alphanum = |c| ('0' <= c && c <= '9') || is_alpha(c);
 
-        while is_alphanum(self.peek()) {
-            self.advance();
+        while let Some(c) = self.peek() {
+            if is_alphanum(c) {
+                self.advance();
+            } else {
+                break
+            }
         }
 
         let token_type = self.ident_keyword_type();
