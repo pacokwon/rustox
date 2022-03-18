@@ -27,9 +27,12 @@ impl<'src> Scanner<'src> {
         use TokenType::*;
 
         self.skip_whitespace();
-
         if self.is_at_end() {
-            return self.make_token(Eof);
+            return Token {
+                token_type: Eof,
+                lexeme: "".to_owned(),
+                line: self.line,
+            };
         }
 
         self.start = self.current;
