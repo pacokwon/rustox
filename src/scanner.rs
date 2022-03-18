@@ -110,7 +110,7 @@ impl<'src> Scanner<'src> {
                     self.line += 1;
                 },
                 '/' => if let Some('/') = self.peek_next() {
-                    while self.peek() != '\n' && !self.is_at_end() {
+                    while !self.is_at_end() && self.peek() != '\n' {
                         self.advance();
                     }
                 },
