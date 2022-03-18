@@ -113,6 +113,8 @@ impl<'src> Scanner<'src> {
                     while !self.is_at_end() && self.peek() != '\n' {
                         self.advance();
                     }
+                } else {
+                    break
                 },
                 _ => break,
             }
