@@ -81,9 +81,9 @@ impl<'src> Scanner<'src> {
     fn consume_eq(&mut self, c: char) -> bool {
         if self.peek() == c {
             self.advance();
-            false
-        } else {
             true
+        } else {
+            false
         }
     }
 
