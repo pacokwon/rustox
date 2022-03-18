@@ -40,7 +40,11 @@ impl<'src> Scanner<'src> {
 
         let mut eq_lookahead = |eq, ne| {
             let tt = {
-                if self.consume_eq('=') { eq } else { ne }
+                if self.consume_eq('=') {
+                    eq
+                } else {
+                    ne
+                }
             };
             self.make_token(tt)
         };
@@ -122,17 +126,19 @@ impl<'src> Scanner<'src> {
                 '\n' => {
                     self.advance();
                     self.line += 1;
-                },
-                '/' => if let Some('/') = self.peek_next() {
-                    while let Some(c) = self.peek() {
-                        if c == '\n' {
-                            break
+                }
+                '/' => {
+                    if let Some('/') = self.peek_next() {
+                        while let Some(c) = self.peek() {
+                            if c == '\n' {
+                                break;
+                            }
+                            self.advance();
                         }
-                        self.advance();
+                    } else {
+                        break;
                     }
-                } else {
-                    break
-                },
+                }
                 _ => break,
             }
         }
@@ -143,11 +149,11 @@ impl<'src> Scanner<'src> {
             match self.peek() {
                 Some(c) => {
                     if c == '"' {
-                        break
+                        break;
                     } else {
                         self.advance();
                     }
-                },
+                }
                 None => return self.error_token("Reached Eof while scanning string."),
             }
         }
@@ -162,7 +168,7 @@ impl<'src> Scanner<'src> {
             if c.is_digit(10) {
                 self.advance();
             } else {
-                break
+                break;
             }
         }
 
@@ -172,12 +178,14 @@ impl<'src> Scanner<'src> {
                 if c.is_digit(10) {
                     self.advance();
                 } else {
-                    break
+                    break;
                 }
             }
         }
 
-        let num = self.source[self.start..self.current].parse::<f64>().unwrap();
+        let num = self.source[self.start..self.current]
+            .parse::<f64>()
+            .unwrap();
         Token {
             token_type: TokenType::Number(num),
             lexeme: self.source[self.start..self.current].to_owned(),
@@ -193,7 +201,7 @@ impl<'src> Scanner<'src> {
             if is_alphanum(c) {
                 self.advance();
             } else {
-                break
+                break;
             }
         }
 
@@ -284,7 +292,9 @@ mod tests {
     fn scan_tokens(code: &str) -> Vec<Token> {
         let mut sc = Scanner::new(code);
         let mut v = Vec::new();
-        while !sc.is_at_end() { v.push(sc.scan_token()) }
+        while !sc.is_at_end() {
+            v.push(sc.scan_token())
+        }
         println!("{:?}", v);
         v
     }
@@ -296,7 +306,10 @@ mod tests {
             (r1, r2) => assert_eq!(r1, r2),
         };
 
-        result.into_iter().zip(expected).for_each(|(r, e)| compare_tt(r.token_type, e))
+        result
+            .into_iter()
+            .zip(expected)
+            .for_each(|(r, e)| compare_tt(r.token_type, e))
     }
 
     fn test_code(code: &str, expected: Vec<TokenType>) {
@@ -317,9 +330,19 @@ mod tests {
                     var b = 2;\n\
                     print a;";
         let expected = vec![
-            Var, Identifier, Equal, Number(1f64), Semicolon,
-            Var, Identifier, Equal, Number(2f64), Semicolon,
-            Print, Identifier, Semicolon,
+            Var,
+            Identifier,
+            Equal,
+            Number(1f64),
+            Semicolon,
+            Var,
+            Identifier,
+            Equal,
+            Number(2f64),
+            Semicolon,
+            Print,
+            Identifier,
+            Semicolon,
         ];
         test_code(code, expected);
     }
@@ -328,9 +351,18 @@ mod tests {
     fn operators() {
         let code = "+ - * / < > = ! <= >= == !=";
         let expected = vec![
-            Plus, Minus, Star, Slash, Lesser,
-            Greater, Equal, Bang, LesserEqual,
-            GreaterEqual, EqualEqual, BangEqual,
+            Plus,
+            Minus,
+            Star,
+            Slash,
+            Lesser,
+            Greater,
+            Equal,
+            Bang,
+            LesserEqual,
+            GreaterEqual,
+            EqualEqual,
+            BangEqual,
         ];
         test_code(code, expected);
     }
@@ -339,9 +371,7 @@ mod tests {
     fn symbols() {
         let code = "} { ) ( . , ;";
         let expected = vec![
-            RightBrace, LeftBrace,
-            RightParen, LeftParen,
-            Dot, Comma, Semicolon,
+            RightBrace, LeftBrace, RightParen, LeftParen, Dot, Comma, Semicolon,
         ];
         test_code(code, expected);
     }
