@@ -1,6 +1,7 @@
 #[derive(Debug, Clone, Copy)]
 pub enum Opcode {
     Return = 0,
+    Constant,
     Invalid = 255,
 }
 
@@ -13,7 +14,7 @@ impl From<u8> for Opcode {
 impl From<usize> for Opcode {
     fn from(v: usize) -> Self {
         use Opcode::*;
-        let lookup_tbl = [Return];
+        let lookup_tbl = [Return, Constant];
         if v < lookup_tbl.len() {
             lookup_tbl[v]
         } else {
@@ -33,8 +34,9 @@ impl Opcode {
         use Opcode::*;
 
         match self {
-            Return => 1,
             Invalid => 0,
+            Return => 1,
+            Constant => 2,
         }
     }
 }

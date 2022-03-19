@@ -23,6 +23,12 @@ impl Chunk {
         self.code[addr].into()
     }
 
+    /// addr is u8 because the address will usually
+    /// be read from the chunk, which is u8
+    pub fn read_val(&self, addr: u8) -> Value {
+        self.values[addr as usize]
+    }
+
     pub fn write_opcode(&mut self, opcode: Opcode) {
         self.write(opcode.into());
     }
@@ -31,14 +37,14 @@ impl Chunk {
         self.code.push(byte);
     }
 
-    pub fn write_two_opcodes(&mut self, o1: Opcode, o2: Opcode) {
-        self.write_opcode(o1);
-        self.write_opcode(o2);
+    pub fn write_binary(&mut self, o: Opcode, b: u8) {
+        self.write_opcode(o);
+        self.write(b);
     }
 
-    pub fn write_two(&mut self, b1: u8, b2: u8) {
-        self.code.push(b1);
-        self.code.push(b2);
+    pub fn add_const(&mut self, val: Value) -> u8 {
+        self.values.push(val);
+        (self.values.len() - 1).try_into().unwrap()
     }
 
     pub fn len(&self) -> usize {
