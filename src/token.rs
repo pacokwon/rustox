@@ -1,4 +1,4 @@
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum TokenType {
     // Single-Character Tokens
     LeftParen, RightParen,
@@ -13,7 +13,7 @@ pub enum TokenType {
     Lesser, LesserEqual,
 
     // Literals.
-    Identifier, String, Number(f64),
+    Identifier, String, Number,
 
     // Keywords.
     And, Assert, Class, Else, False,

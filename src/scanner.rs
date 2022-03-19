@@ -183,11 +183,8 @@ impl<'src> Scanner<'src> {
             }
         }
 
-        let num = self.source[self.start..self.current]
-            .parse::<f64>()
-            .unwrap();
         Token {
-            token_type: TokenType::Number(num),
+            token_type: TokenType::Number,
             lexeme: self.source[self.start..self.current].to_owned(),
             line: self.line,
         }
@@ -301,10 +298,7 @@ mod tests {
 
     fn compare(result: Vec<Token>, expected: Vec<TokenType>) {
         assert_eq!(result.len(), expected.len());
-        let compare_tt = |tt1, tt2| match (tt1, tt2) {
-            (Number(_), Number(_)) => (),
-            (r1, r2) => assert_eq!(r1, r2),
-        };
+        let compare_tt = |tt1, tt2| assert_eq!(tt1, tt2);
 
         result
             .into_iter()
@@ -320,7 +314,7 @@ mod tests {
     #[test]
     fn variable() {
         let code = "var a = 1;";
-        let expected = vec![Var, Identifier, Equal, Number(1f64), Semicolon];
+        let expected = vec![Var, Identifier, Equal, Number, Semicolon];
         test_code(code, expected);
     }
 
@@ -333,12 +327,12 @@ mod tests {
             Var,
             Identifier,
             Equal,
-            Number(1f64),
+            Number,
             Semicolon,
             Var,
             Identifier,
             Equal,
-            Number(2f64),
+            Number,
             Semicolon,
             Print,
             Identifier,
@@ -379,7 +373,7 @@ mod tests {
     #[test]
     fn literals() {
         let code = "\"Hello World\" 3.1415";
-        let expected = vec![String, Number(3.1415)];
+        let expected = vec![String, Number];
         test_code(code, expected);
     }
 
