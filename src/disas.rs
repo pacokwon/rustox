@@ -12,7 +12,13 @@ impl Chunk {
     }
 
     pub fn disas_inst(&self, offset: usize) -> usize {
-        print!("{addr:<width$} ", addr=offset, width=4);
+        print!("{addr:0>width$} ", addr=offset, width=4);
+
+        if offset > 0 && self.lines[offset - 1] == self.lines[offset] {
+            print!("{:>4} ", "|");
+        } else {
+            print!("{:>4} ", self.lines[offset]);
+        }
 
         let opcode = self.read_opcode(offset);
         self.disas_opcode(opcode, offset);
