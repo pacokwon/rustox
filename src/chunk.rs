@@ -1,6 +1,5 @@
 use crate::opcode::Opcode;
-
-type Value = f64;
+use crate::value::Value;
 
 pub struct Chunk {
     code: Vec<u8>,
@@ -27,7 +26,7 @@ impl Chunk {
 
     /// addr is u8 because the address will usually
     /// be read from the chunk, which is u8
-    pub fn read_val(&self, addr: u8) -> Value {
+    pub fn read_value(&self, addr: u8) -> Value {
         self.values[addr as usize]
     }
 
@@ -40,7 +39,7 @@ impl Chunk {
         self.lines.push(line);
     }
 
-    pub fn write_binary(&mut self, o: Opcode, b: u8, line: u32) {
+    pub fn write_two(&mut self, o: Opcode, b: u8, line: u32) {
         self.write_opcode(o, line);
         self.write(b, line);
     }

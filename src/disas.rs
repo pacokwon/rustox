@@ -1,5 +1,6 @@
 use crate::chunk::Chunk;
 use crate::opcode::Opcode;
+use crate::vm::Vm;
 
 impl Chunk {
     pub fn disas(&self, name: &str) {
@@ -31,9 +32,15 @@ impl Chunk {
             Invalid | Return => println!("{:?}", opcode),
             Constant => {
                 let voff = self.read(offset + 1);
-                let constant = self.read_val(voff);
+                let constant = self.read_value(voff);
                 println!("{:<16} {:<4} '{}'", format!("{:?}", opcode), voff, constant);
             },
         }
+    }
+}
+
+impl Vm {
+    pub fn disas_stack(&self) {
+        println!("{:?}", self.stack);
     }
 }
