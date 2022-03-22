@@ -34,6 +34,7 @@ impl Vm {
         loop {
             let opcode: Opcode = self.read().into();
             match opcode {
+                Opcode::Invalid => panic!("Invalid instruction."),
                 Opcode::Return => {
                     let popped = self.pop();
                     println!("Return: {}", popped);
@@ -42,8 +43,31 @@ impl Vm {
                 Opcode::Constant => {
                     let val = self.read_constant();
                     self.push(val);
-                }
-                Opcode::Invalid => panic!("Invalid instruction."),
+                },
+                Opcode::Negate => {
+                    let popped = self.pop();
+                    self.push(-popped);
+                },
+                Opcode::Add => {
+                    let b = self.pop();
+                    let a = self.pop();
+                    self.push(a + b);
+                },
+                Opcode::Subtract => {
+                    let b = self.pop();
+                    let a = self.pop();
+                    self.push(a - b);
+                },
+                Opcode::Multiply => {
+                    let b = self.pop();
+                    let a = self.pop();
+                    self.push(a * b);
+                },
+                Opcode::Divide => {
+                    let b = self.pop();
+                    let a = self.pop();
+                    self.push(a / b);
+                },
             }
         }
     }

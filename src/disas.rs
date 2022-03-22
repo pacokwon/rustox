@@ -29,7 +29,8 @@ impl Chunk {
     pub fn disas_opcode(&self, opcode: Opcode, offset: usize) {
         use Opcode::*;
         match opcode {
-            Invalid | Return => println!("{:?}", opcode),
+            Invalid | Return | Negate |
+            Add | Subtract | Multiply | Divide => println!("{:?}", opcode),
             Constant => {
                 let voff = self.read(offset + 1);
                 let constant = self.read_value(voff);
