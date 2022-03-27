@@ -98,3 +98,37 @@ impl Vm {
         self.stack.pop().expect("Stack is empty.")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_const(chunk: &mut Chunk, val: Value) {
+        let idx = chunk.add_const(val);
+        chunk.write_two(Opcode::Constant, idx, 1);
+    }
+
+    #[test]
+    fn add() {
+        let mut vm = Vm::new();
+        let mut chunk = Chunk::new();
+        make_const(&mut chunk, 1f64);
+        make_const(&mut chunk, 2f64);
+        chunk.write_opcode(Opcode::Add, 1);
+        chunk.write_opcode(Opcode::Return, 1);
+        assert_eq!(vm.interpret(chunk), InterpretResult::Ok);
+    }
+
+    #[test]
+    fn mixed() {
+        let mut vm = Vm::new();
+        let mut chunk = Chunk::new();
+        make_const(&mut chunk, 1f64);
+        make_const(&mut chunk, 2f64);
+        chunk.write_opcode(Opcode::Add, 1);
+        make_const(&mut chunk, 4f64);
+        chunk.write_opcode(Opcode::Multiply, 1);
+        chunk.write_opcode(Opcode::Return, 1);
+        assert_eq!(vm.interpret(chunk), InterpretResult::Ok);
+    }
+}
