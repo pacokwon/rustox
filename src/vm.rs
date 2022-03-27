@@ -6,6 +6,7 @@ pub struct Vm {
     pc: usize,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterpretResult {
     Ok,
     CompileError,
