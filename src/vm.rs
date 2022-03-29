@@ -112,8 +112,8 @@ mod tests {
     fn add() {
         let mut vm = Vm::new();
         let mut chunk = Chunk::new();
-        make_const(&mut chunk, 1f64);
-        make_const(&mut chunk, 2f64);
+        make_const(&mut chunk, Value::Number(1f64));
+        make_const(&mut chunk, Value::Number(2f64));
         chunk.write_opcode(Opcode::Add, 1);
         chunk.write_opcode(Opcode::Return, 1);
         assert_eq!(vm.interpret(chunk), InterpretResult::Ok);
@@ -123,10 +123,10 @@ mod tests {
     fn mixed() {
         let mut vm = Vm::new();
         let mut chunk = Chunk::new();
-        make_const(&mut chunk, 1f64);
-        make_const(&mut chunk, 2f64);
+        make_const(&mut chunk, Value::Number(1f64));
+        make_const(&mut chunk, Value::Number(2f64));
         chunk.write_opcode(Opcode::Add, 1);
-        make_const(&mut chunk, 4f64);
+        make_const(&mut chunk, Value::Number(4f64));
         chunk.write_opcode(Opcode::Multiply, 1);
         chunk.write_opcode(Opcode::Return, 1);
         assert_eq!(vm.interpret(chunk), InterpretResult::Ok);
