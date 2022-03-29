@@ -42,7 +42,7 @@ impl Vm {
                     return InterpretResult::Ok
                 },
                 Opcode::Constant => {
-                    let val = self.read_constant();
+                    let val = self.read_constant().clone();
                     self.push(val);
                 },
                 Opcode::Negate => {
@@ -69,6 +69,15 @@ impl Vm {
                     let a = self.pop();
                     self.push(a / b);
                 },
+                Opcode::Nil => {
+                    self.push(Value::Nil);
+                },
+                Opcode::True => {
+                    self.push(Value::True);
+                },
+                Opcode::False => {
+                    self.push(Value::False);
+                },
             }
         }
     }
@@ -81,11 +90,11 @@ impl Vm {
         inst
     }
 
-    fn read_value(&mut self, addr: u8) -> Value {
+    fn read_value(&mut self, addr: u8) -> &Value {
         self.current_chunk().read_value(addr)
     }
 
-    fn read_constant(&mut self) -> Value {
+    fn read_constant(&mut self) -> &Value {
         let addr = self.read();
         self.read_value(addr)
     }

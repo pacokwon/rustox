@@ -26,8 +26,8 @@ impl Chunk {
 
     /// addr is u8 because the address will usually
     /// be read from the chunk, which is u8
-    pub fn read_value(&self, addr: u8) -> Value {
-        self.values[addr as usize]
+    pub fn read_value(&self, addr: u8) -> &Value {
+        &self.values[addr as usize]
     }
 
     pub fn write_opcode(&mut self, opcode: Opcode, line: u32) {

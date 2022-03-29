@@ -73,17 +73,17 @@ fn init_rules<'src>() -> Vec<ParseRule<'src>> {
     set(Assert, Compiler::skip, Compiler::skip, Precedence::None);
     set(Class, Compiler::skip, Compiler::skip, Precedence::None);
     set(Else, Compiler::skip, Compiler::skip, Precedence::None);
-    set(False, Compiler::skip, Compiler::skip, Precedence::None);
+    set(False, Compiler::literal, Compiler::skip, Precedence::None);
     set(For, Compiler::skip, Compiler::skip, Precedence::None);
     set(Fun, Compiler::skip, Compiler::skip, Precedence::None);
     set(If, Compiler::skip, Compiler::skip, Precedence::None);
-    set(Nil, Compiler::skip, Compiler::skip, Precedence::None);
+    set(Nil, Compiler::literal, Compiler::skip, Precedence::None);
     set(Or, Compiler::skip, Compiler::skip, Precedence::None);
     set(Print, Compiler::skip, Compiler::skip, Precedence::None);
     set(Return, Compiler::skip, Compiler::skip, Precedence::None);
     set(Super, Compiler::skip, Compiler::skip, Precedence::None);
     set(This, Compiler::skip, Compiler::skip, Precedence::None);
-    set(True, Compiler::skip, Compiler::skip, Precedence::None);
+    set(True, Compiler::literal, Compiler::skip, Precedence::None);
     set(Var, Compiler::skip, Compiler::skip, Precedence::None);
     set(While, Compiler::skip, Compiler::skip, Precedence::None);
 
@@ -194,7 +194,7 @@ impl<'src> Compiler<'src> {
             .parse::<f64>()
             .expect("Expected number.");
 
-        self.emit_const(value);
+        self.emit_const(Value::Number(value));
     }
 
     fn expression(&mut self) {
@@ -230,6 +230,16 @@ impl<'src> Compiler<'src> {
             TokenType::Slash => self.emit_opcode(Opcode::Divide),
             _ => panic!("Invalid binary operator token {:?}", op_type),
         };
+    }
+
+    fn literal(&mut self) {
+        let op_type = self.parser.previous.token_type;
+        match op_type {
+            TokenType::Nil => self.emit_opcode(Opcode::Nil),
+            TokenType::True => self.emit_opcode(Opcode::True),
+            TokenType::False => self.emit_opcode(Opcode::False),
+            _ => panic!("Invalid literal token {:?}", op_type),
+        }
     }
 
     /// dummy parse function for doing nothing

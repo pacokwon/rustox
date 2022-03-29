@@ -30,7 +30,8 @@ impl Chunk {
         use Opcode::*;
         match opcode {
             Invalid | Return | Negate |
-            Add | Subtract | Multiply | Divide => println!("{:?}", opcode),
+            Add | Subtract | Multiply | Divide |
+            Nil | True | False => println!("{:?}", opcode),
             Constant => {
                 let voff = self.read(offset + 1);
                 let constant = self.read_value(voff);

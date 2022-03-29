@@ -7,6 +7,9 @@ pub enum Opcode {
     Subtract,
     Multiply,
     Divide,
+    Nil,
+    True,
+    False,
     Invalid = 255,
 }
 
@@ -48,7 +51,9 @@ impl Opcode {
 
         match self {
             Invalid => 0,
-            Return | Negate | Add | Subtract | Multiply | Divide => 1,
+            Return |
+            Negate | Add | Subtract | Multiply | Divide |
+            Nil | True | False => 1,
             Constant => 2,
         }
     }
