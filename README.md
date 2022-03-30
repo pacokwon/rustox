@@ -1,6 +1,11 @@
 # [WIP] `rlox`
 Rust implementation of the Lox language, from the book [Crafting Interpreters](http://craftinginterpreters.com/).
 
-This version of Lox is a compiled language, targeting a custom stack-based VM.
+This implementation of Lox features:
+- A bytecode compiler
+- A bytecode virtual machine
+- Pratt parsing
+- Full programming language constructs (WIP)
+- (etc.)
 
-The implementation may vary greatly, since the original implementation in the book is written in C.
+**NOTE**: The implementation may vary greatly, as the original implementation in the book is written in C.
