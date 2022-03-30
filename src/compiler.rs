@@ -46,7 +46,7 @@ fn init_rules<'src>() -> Vec<ParseRule<'src>> {
     set(Slash, Compiler::skip, Compiler::binary, Precedence::Factor);
     set(Star, Compiler::skip, Compiler::binary, Precedence::Factor);
 
-    set(Bang, Compiler::skip, Compiler::skip, Precedence::None);
+    set(Bang, Compiler::unary, Compiler::skip, Precedence::None);
     set(BangEqual, Compiler::skip, Compiler::skip, Precedence::None);
     set(Equal, Compiler::skip, Compiler::skip, Precedence::None);
     set(EqualEqual, Compiler::skip, Compiler::skip, Precedence::None);
@@ -214,6 +214,7 @@ impl<'src> Compiler<'src> {
 
         match op_type {
             TokenType::Minus => self.emit_opcode(Opcode::Negate),
+            TokenType::Bang => self.emit_opcode(Opcode::Not),
             _ => panic!("Invalid unary operator token {:?}", op_type),
         }
     }

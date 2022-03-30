@@ -10,6 +10,7 @@ pub enum Opcode {
     Nil,
     True,
     False,
+    Not,
     Invalid = 255,
 }
 
@@ -53,7 +54,8 @@ impl Opcode {
             Invalid => 0,
             Return |
             Negate | Add | Subtract | Multiply | Divide |
-            Nil | True | False => 1,
+            Nil | True | False |
+            Not => 1,
             Constant => 2,
         }
     }

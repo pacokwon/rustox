@@ -73,10 +73,14 @@ impl Vm {
                     self.push(Value::Nil);
                 },
                 Opcode::True => {
-                    self.push(Value::True);
+                    self.push(Value::Bool(true));
                 },
                 Opcode::False => {
-                    self.push(Value::False);
+                    self.push(Value::Bool(false));
+                },
+                Opcode::Not => {
+                    let b = self.pop();
+                    self.push(Value::Bool(!b.truthy()));
                 },
             }
         }

@@ -1,18 +1,21 @@
-use std::{ops::{Neg, Add, Sub, Mul, Div}, fmt::Display};
+use std::{
+    fmt::Display,
+    ops::{Add, Div, Mul, Neg, Not, Sub},
+};
 
 #[derive(Debug, Clone)]
 pub enum Value {
     Number(f64),
+    Bool(bool),
     Nil,
-    True,
-    False,
 }
 
 impl Value {
-    pub fn as_number(&self) -> f64 {
+    pub fn truthy(&self) -> bool {
         match *self {
-            Value::Number(f) => f,
-            _ => panic!("Expected Number. Encountered {}", *self),
+            Value::Nil => false,
+            Value::Bool(false) => false,
+            _ => true,
         }
     }
 }
@@ -22,8 +25,8 @@ impl Display for Value {
         match *self {
             Value::Number(v) => write!(f, "{}", v),
             Value::Nil => write!(f, "Nil"),
-            Value::True => write!(f, "True"),
-            Value::False => write!(f, "False"),
+            Value::Bool(true) => write!(f, "True"),
+            Value::Bool(false) => write!(f, "False"),
         }
     }
 }
@@ -79,6 +82,17 @@ impl Div for Value {
         match (self, rhs) {
             (Value::Number(l), Value::Number(r)) => Value::Number(l / r),
             (l, r) => panic!("Expected Number. Encountered {} and {}", l, r),
+        }
+    }
+}
+
+impl Not for Value {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        match self {
+            Value::Bool(b) => Value::Bool(!b),
+            v => panic!("Expected Bool. Encountered {}", v),
         }
     }
 }
