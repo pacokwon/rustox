@@ -1,4 +1,4 @@
-# [WIP] `rlox`
+# Rustox (WIP)
 Rust implementation of the Lox language, from the book [Crafting Interpreters](http://craftinginterpreters.com/).
 
 This implementation of Lox features:
