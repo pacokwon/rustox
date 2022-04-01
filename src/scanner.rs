@@ -391,4 +391,11 @@ mod tests {
         let expected = vec![Error];
         test_code(code, expected);
     }
+
+    #[test]
+    fn comparison() {
+        let code = "3 < 4";
+        let expected = vec![Number, Lesser, Number];
+        test_code(code, expected);
+    }
 }

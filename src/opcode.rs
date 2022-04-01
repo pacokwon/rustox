@@ -11,6 +11,9 @@ pub enum Opcode {
     True,
     False,
     Not,
+    Equal,
+    Greater,
+    Lesser,
     Invalid = 255,
 }
 
@@ -24,18 +27,13 @@ impl From<usize> for Opcode {
     fn from(v: usize) -> Self {
         use Opcode::*;
         let lookup_tbl = [
-            Return,
-            Constant,
-            Negate,
-            Add,
-            Subtract,
-            Multiply,
-            Divide,
+            Return, Constant, Negate, Add, Subtract, Multiply, Divide, Nil, True, False, Not,
+            Equal, Greater, Lesser,
         ];
         if v < lookup_tbl.len() {
             lookup_tbl[v]
         } else {
-            Invalid
+            panic!("Invalid instruction byte {}", v);
         }
     }
 }
@@ -52,10 +50,8 @@ impl Opcode {
 
         match self {
             Invalid => 0,
-            Return |
-            Negate | Add | Subtract | Multiply | Divide |
-            Nil | True | False |
-            Not => 1,
+            Return | Negate | Add | Subtract | Multiply | Divide | Nil | True | False | Not
+            | Equal | Greater | Lesser => 1,
             Constant => 2,
         }
     }

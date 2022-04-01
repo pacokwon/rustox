@@ -13,8 +13,8 @@ pub enum Value {
 impl Value {
     pub fn truthy(&self) -> bool {
         match *self {
-            Value::Nil => false,
-            Value::Bool(false) => false,
+            Self::Nil => false,
+            Self::Bool(false) => false,
             _ => true,
         }
     }
@@ -23,10 +23,10 @@ impl Value {
 impl Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
-            Value::Number(v) => write!(f, "{}", v),
-            Value::Nil => write!(f, "Nil"),
-            Value::Bool(true) => write!(f, "True"),
-            Value::Bool(false) => write!(f, "False"),
+            Self::Number(v) => write!(f, "{}", v),
+            Self::Nil => write!(f, "Nil"),
+            Self::Bool(true) => write!(f, "True"),
+            Self::Bool(false) => write!(f, "False"),
         }
     }
 }
@@ -36,7 +36,7 @@ impl Neg for Value {
 
     fn neg(self) -> Self::Output {
         match self {
-            Value::Number(f) => Value::Number(-f),
+            Self::Number(f) => Self::Number(-f),
             v => panic!("Expected Number. Encountered {}", v),
         }
     }
@@ -47,7 +47,7 @@ impl Add for Value {
 
     fn add(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Number(l), Value::Number(r)) => Value::Number(l + r),
+            (Self::Number(l), Self::Number(r)) => Self::Number(l + r),
             (l, r) => panic!("Expected Number. Encountered {} and {}", l, r),
         }
     }
@@ -58,7 +58,7 @@ impl Sub for Value {
 
     fn sub(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Number(l), Value::Number(r)) => Value::Number(l - r),
+            (Self::Number(l), Self::Number(r)) => Self::Number(l - r),
             (l, r) => panic!("Expected Number. Encountered {} and {}", l, r),
         }
     }
@@ -69,7 +69,7 @@ impl Mul for Value {
 
     fn mul(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Number(l), Value::Number(r)) => Value::Number(l * r),
+            (Self::Number(l), Self::Number(r)) => Self::Number(l * r),
             (l, r) => panic!("Expected Number. Encountered {} and {}", l, r),
         }
     }
@@ -80,7 +80,7 @@ impl Div for Value {
 
     fn div(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (Value::Number(l), Value::Number(r)) => Value::Number(l / r),
+            (Self::Number(l), Self::Number(r)) => Self::Number(l / r),
             (l, r) => panic!("Expected Number. Encountered {} and {}", l, r),
         }
     }
@@ -91,8 +91,28 @@ impl Not for Value {
 
     fn not(self) -> Self::Output {
         match self {
-            Value::Bool(b) => Value::Bool(!b),
+            Self::Bool(b) => Self::Bool(!b),
             v => panic!("Expected Bool. Encountered {}", v),
+        }
+    }
+}
+
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Number(l), Self::Number(r)) => l == r,
+            (Self::Bool(l), Self::Bool(r)) => l == r,
+            (Self::Nil, Self::Nil) => true,
+            _ => false,
+        }
+    }
+}
+
+impl PartialOrd for Value {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        match (self, other) {
+            (Self::Number(l), Self::Number(r)) => l.partial_cmp(r),
+            _ => None,
         }
     }
 }

@@ -47,22 +47,22 @@ fn init_rules<'src>() -> Vec<ParseRule<'src>> {
     set(Star, Compiler::skip, Compiler::binary, Precedence::Factor);
 
     set(Bang, Compiler::unary, Compiler::skip, Precedence::None);
-    set(BangEqual, Compiler::skip, Compiler::skip, Precedence::None);
+    set(BangEqual, Compiler::skip, Compiler::binary, Precedence::Equality);
     set(Equal, Compiler::skip, Compiler::skip, Precedence::None);
-    set(EqualEqual, Compiler::skip, Compiler::skip, Precedence::None);
-    set(Greater, Compiler::skip, Compiler::skip, Precedence::None);
+    set(EqualEqual, Compiler::skip, Compiler::binary, Precedence::Equality);
+    set(Greater, Compiler::skip, Compiler::binary, Precedence::Comparison);
     set(
         GreaterEqual,
         Compiler::skip,
-        Compiler::skip,
-        Precedence::None,
+        Compiler::binary,
+        Precedence::Comparison,
     );
-    set(Lesser, Compiler::skip, Compiler::skip, Precedence::None);
+    set(Lesser, Compiler::skip, Compiler::binary, Precedence::Comparison);
     set(
         LesserEqual,
         Compiler::skip,
-        Compiler::skip,
-        Precedence::None,
+        Compiler::binary,
+        Precedence::Comparison,
     );
 
     set(Identifier, Compiler::skip, Compiler::skip, Precedence::None);
@@ -229,6 +229,21 @@ impl<'src> Compiler<'src> {
             TokenType::Minus => self.emit_opcode(Opcode::Subtract),
             TokenType::Star => self.emit_opcode(Opcode::Multiply),
             TokenType::Slash => self.emit_opcode(Opcode::Divide),
+            TokenType::EqualEqual => self.emit_opcode(Opcode::Equal),
+            TokenType::BangEqual => {
+                self.emit_opcode(Opcode::Equal);
+                self.emit_opcode(Opcode::Not);
+            },
+            TokenType::Greater => self.emit_opcode(Opcode::Greater),
+            TokenType::Lesser => self.emit_opcode(Opcode::Lesser),
+            TokenType::GreaterEqual => {
+                self.emit_opcode(Opcode::Lesser);
+                self.emit_opcode(Opcode::Not);
+            },
+            TokenType::LesserEqual => {
+                self.emit_opcode(Opcode::Greater);
+                self.emit_opcode(Opcode::Not);
+            },
             _ => panic!("Invalid binary operator token {:?}", op_type),
         };
     }

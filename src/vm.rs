@@ -39,49 +39,80 @@ impl Vm {
                 Opcode::Return => {
                     let popped = self.pop();
                     println!("Return: {}", popped);
-                    return InterpretResult::Ok
-                },
+                    return InterpretResult::Ok;
+                }
                 Opcode::Constant => {
                     let val = self.read_constant().clone();
                     self.push(val);
-                },
+                }
                 Opcode::Negate => {
                     let popped = self.pop();
                     self.push(-popped);
-                },
+                }
                 Opcode::Add => {
                     let b = self.pop();
                     let a = self.pop();
                     self.push(a + b);
-                },
+                }
                 Opcode::Subtract => {
                     let b = self.pop();
                     let a = self.pop();
                     self.push(a - b);
-                },
+                }
                 Opcode::Multiply => {
                     let b = self.pop();
                     let a = self.pop();
                     self.push(a * b);
-                },
+                }
                 Opcode::Divide => {
                     let b = self.pop();
                     let a = self.pop();
                     self.push(a / b);
-                },
+                }
                 Opcode::Nil => {
                     self.push(Value::Nil);
-                },
+                }
                 Opcode::True => {
                     self.push(Value::Bool(true));
-                },
+                }
                 Opcode::False => {
                     self.push(Value::Bool(false));
-                },
+                }
                 Opcode::Not => {
                     let b = self.pop();
                     self.push(Value::Bool(!b.truthy()));
-                },
+                }
+                Opcode::Equal => {
+                    let b = self.pop();
+                    let a = self.pop();
+                    self.push(Value::Bool(a == b));
+                }
+                Opcode::Greater => {
+                    use std::cmp::Ordering;
+
+                    let b = self.pop();
+                    let a = self.pop();
+                    match a.partial_cmp(&b) {
+                        Some(Ordering::Less) | Some(Ordering::Equal) => {
+                            self.push(Value::Bool(false))
+                        }
+                        Some(Ordering::Greater) => self.push(Value::Bool(true)),
+                        None => panic!("Invalid comparison: {} > {}", a, b),
+                    };
+                }
+                Opcode::Lesser => {
+                    use std::cmp::Ordering;
+
+                    let b = self.pop();
+                    let a = self.pop();
+                    match a.partial_cmp(&b) {
+                        Some(Ordering::Less) => self.push(Value::Bool(true)),
+                        Some(Ordering::Equal) | Some(Ordering::Greater) => {
+                            self.push(Value::Bool(false))
+                        }
+                        None => panic!("Invalid comparison: {} > {}", a, b),
+                    };
+                }
             }
         }
     }
