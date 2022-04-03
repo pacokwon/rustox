@@ -238,7 +238,7 @@ impl<'src> Scanner<'src> {
             Some('e') => compare_rest(1, "lse", Else),
             Some('i') => compare_rest(1, "f", If),
             Some('n') => compare_rest(1, "il", Nil),
-            Some('o') => compare_rest(1, "r", Nil),
+            Some('o') => compare_rest(1, "r", Or),
             Some('p') => compare_rest(1, "rint", Print),
             Some('r') => compare_rest(1, "eturn", Return),
             Some('s') => compare_rest(1, "uper", Super),
@@ -257,7 +257,7 @@ impl<'src> Scanner<'src> {
             },
             Some('t') => match it.next() {
                 Some('h') => compare_rest(2, "is", This),
-                Some('u') => compare_rest(2, "e", True),
+                Some('r') => compare_rest(2, "ue", True),
                 _ => Identifier,
             },
             _ => Identifier,
@@ -396,6 +396,20 @@ mod tests {
     fn comparison() {
         let code = "3 < 4";
         let expected = vec![Number, Lesser, Number];
+        test_code(code, expected);
+    }
+
+    #[test]
+    fn logical() {
+        let code = "true and false";
+        let expected = vec![True, And, False];
+        test_code(code, expected);
+    }
+
+    #[test]
+    fn logical2() {
+        let code = "true or true and false";
+        let expected = vec![True, Or, True, And, False];
         test_code(code, expected);
     }
 }
