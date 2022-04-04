@@ -14,6 +14,8 @@ pub enum Opcode {
     Equal,
     Greater,
     Lesser,
+    And,
+    Or,
     Invalid = 255,
 }
 
@@ -28,7 +30,7 @@ impl From<usize> for Opcode {
         use Opcode::*;
         let lookup_tbl = [
             Return, Constant, Negate, Add, Subtract, Multiply, Divide, Nil, True, False, Not,
-            Equal, Greater, Lesser,
+            Equal, Greater, Lesser, And, Or
         ];
         if v < lookup_tbl.len() {
             lookup_tbl[v]
@@ -51,7 +53,7 @@ impl Opcode {
         match self {
             Invalid => 0,
             Return | Negate | Add | Subtract | Multiply | Divide | Nil | True | False | Not
-            | Equal | Greater | Lesser => 1,
+            | Equal | Greater | Lesser | And | Or => 1,
             Constant => 2,
         }
     }

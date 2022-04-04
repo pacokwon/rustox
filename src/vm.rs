@@ -83,15 +83,13 @@ impl Vm {
                     self.push(Value::Bool(!b.truthy()));
                 }
                 Opcode::Equal => {
-                    let b = self.pop();
-                    let a = self.pop();
+                    let (a, b) = self.pop_two();
                     self.push(Value::Bool(a == b));
                 }
                 Opcode::Greater => {
                     use std::cmp::Ordering;
 
-                    let b = self.pop();
-                    let a = self.pop();
+                    let (a, b) = self.pop_two();
                     match a.partial_cmp(&b) {
                         Some(Ordering::Less) | Some(Ordering::Equal) => {
                             self.push(Value::Bool(false))
@@ -103,8 +101,7 @@ impl Vm {
                 Opcode::Lesser => {
                     use std::cmp::Ordering;
 
-                    let b = self.pop();
-                    let a = self.pop();
+                    let (a, b) = self.pop_two();
                     match a.partial_cmp(&b) {
                         Some(Ordering::Less) => self.push(Value::Bool(true)),
                         Some(Ordering::Equal) | Some(Ordering::Greater) => {
@@ -113,6 +110,26 @@ impl Vm {
                         None => panic!("Invalid comparison: {} > {}", a, b),
                     };
                 }
+                Opcode::And => {
+                    let (a, b) = self.pop_two();
+
+                    // short circuiting
+                    if a.truthy() {
+                        self.push(b);
+                    } else {
+                        self.push(Value::Bool(false));
+                    }
+                },
+                Opcode::Or => {
+                    let (a, b) = self.pop_two();
+
+                    // short circuiting
+                    if a.truthy() {
+                        self.push(Value::Bool(true));
+                    } else {
+                        self.push(b);
+                    }
+                },
             }
         }
     }
@@ -140,6 +157,12 @@ impl Vm {
 
     fn pop(&mut self) -> Value {
         self.stack.pop().expect("Stack is empty.")
+    }
+
+    fn pop_two(&mut self) -> (Value, Value) {
+        let b = self.pop();
+        let a = self.pop();
+        (a, b)
     }
 }
 

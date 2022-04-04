@@ -32,7 +32,8 @@ impl Chunk {
             Invalid | Return | Negate |
             Add | Subtract | Multiply | Divide |
             Nil | True | False |
-            Not | Equal | Greater | Lesser => println!("{:?}", opcode),
+            Not | Equal | Greater | Lesser |
+            And | Or => println!("{:?}", opcode),
             Constant => {
                 let voff = self.read(offset + 1);
                 let constant = self.read_value(voff);

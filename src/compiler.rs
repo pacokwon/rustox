@@ -69,7 +69,7 @@ fn init_rules<'src>() -> Vec<ParseRule<'src>> {
     set(String, Compiler::skip, Compiler::skip, Precedence::None);
     set(Number, Compiler::number, Compiler::skip, Precedence::None);
 
-    set(And, Compiler::skip, Compiler::skip, Precedence::None);
+    set(And, Compiler::skip, Compiler::binary, Precedence::And);
     set(Assert, Compiler::skip, Compiler::skip, Precedence::None);
     set(Class, Compiler::skip, Compiler::skip, Precedence::None);
     set(Else, Compiler::skip, Compiler::skip, Precedence::None);
@@ -78,7 +78,7 @@ fn init_rules<'src>() -> Vec<ParseRule<'src>> {
     set(Fun, Compiler::skip, Compiler::skip, Precedence::None);
     set(If, Compiler::skip, Compiler::skip, Precedence::None);
     set(Nil, Compiler::literal, Compiler::skip, Precedence::None);
-    set(Or, Compiler::skip, Compiler::skip, Precedence::None);
+    set(Or, Compiler::skip, Compiler::binary, Precedence::Or);
     set(Print, Compiler::skip, Compiler::skip, Precedence::None);
     set(Return, Compiler::skip, Compiler::skip, Precedence::None);
     set(Super, Compiler::skip, Compiler::skip, Precedence::None);
@@ -244,6 +244,8 @@ impl<'src> Compiler<'src> {
                 self.emit_opcode(Opcode::Greater);
                 self.emit_opcode(Opcode::Not);
             },
+            TokenType::And => self.emit_opcode(Opcode::And),
+            TokenType::Or => self.emit_opcode(Opcode::Or),
             _ => panic!("Invalid binary operator token {:?}", op_type),
         };
     }
