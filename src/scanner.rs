@@ -158,8 +158,8 @@ impl<'src> Scanner<'src> {
             }
         }
 
-        let token = self.make_token(TokenType::String);
         self.advance();
+        let token = self.make_token(TokenType::String);
         token
     }
 
