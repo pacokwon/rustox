@@ -7,6 +7,7 @@ use std::{
 pub enum Value {
     Number(f64),
     Bool(bool),
+    String(String),
     Nil,
 }
 
@@ -24,6 +25,7 @@ impl Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
             Self::Number(v) => write!(f, "{}", v),
+            Self::String(ref v) => write!(f, "\"{}\"", v),
             Self::Nil => write!(f, "Nil"),
             Self::Bool(true) => write!(f, "True"),
             Self::Bool(false) => write!(f, "False"),
@@ -48,6 +50,9 @@ impl Add for Value {
     fn add(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Self::Number(l), Self::Number(r)) => Self::Number(l + r),
+            (Self::Number(l), Self::String(r)) => Self::String(format!("{}{}", l, r)),
+            (Self::String(l), Self::Number(r)) => Self::String(format!("{}{}", l, r)),
+            (Self::String(l), Self::String(r)) => Self::String(l + &r),
             (l, r) => panic!("Expected Number. Encountered {} and {}", l, r),
         }
     }

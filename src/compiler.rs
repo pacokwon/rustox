@@ -66,7 +66,7 @@ fn init_rules<'src>() -> Vec<ParseRule<'src>> {
     );
 
     set(Identifier, Compiler::skip, Compiler::skip, Precedence::None);
-    set(String, Compiler::skip, Compiler::skip, Precedence::None);
+    set(String, Compiler::string, Compiler::skip, Precedence::None);
     set(Number, Compiler::number, Compiler::skip, Precedence::None);
 
     set(And, Compiler::skip, Compiler::binary, Precedence::And);
@@ -195,6 +195,14 @@ impl<'src> Compiler<'src> {
             .expect("Expected number.");
 
         self.emit_const(Value::Number(value));
+    }
+
+    fn string(&mut self) {
+        let lexeme = &self.parser.previous.lexeme;
+        let length = lexeme.len();
+        let value = &lexeme[1..length-1].to_owned();
+
+        self.emit_const(Value::String(value.to_owned()));
     }
 
     fn expression(&mut self) {
