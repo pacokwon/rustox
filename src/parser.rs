@@ -56,6 +56,19 @@ impl<'src> Parser<'src> {
         }
     }
 
+    pub fn check(&mut self, token_type: TokenType) -> bool {
+        self.current.token_type == token_type
+    }
+
+    pub fn match_token(&mut self, token_type: TokenType) -> bool {
+        if !self.check(token_type) {
+            false
+        } else {
+            self.advance();
+            true
+        }
+    }
+
     pub fn error_at_current(&mut self, message: &'static str) {
         self.error_at(ErrorPoint::Current, message);
     }

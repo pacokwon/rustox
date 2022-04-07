@@ -47,17 +47,37 @@ fn init_rules<'src>() -> Vec<ParseRule<'src>> {
     set(Star, Compiler::skip, Compiler::binary, Precedence::Factor);
 
     set(Bang, Compiler::unary, Compiler::skip, Precedence::None);
-    set(BangEqual, Compiler::skip, Compiler::binary, Precedence::Equality);
+    set(
+        BangEqual,
+        Compiler::skip,
+        Compiler::binary,
+        Precedence::Equality,
+    );
     set(Equal, Compiler::skip, Compiler::skip, Precedence::None);
-    set(EqualEqual, Compiler::skip, Compiler::binary, Precedence::Equality);
-    set(Greater, Compiler::skip, Compiler::binary, Precedence::Comparison);
+    set(
+        EqualEqual,
+        Compiler::skip,
+        Compiler::binary,
+        Precedence::Equality,
+    );
+    set(
+        Greater,
+        Compiler::skip,
+        Compiler::binary,
+        Precedence::Comparison,
+    );
     set(
         GreaterEqual,
         Compiler::skip,
         Compiler::binary,
         Precedence::Comparison,
     );
-    set(Lesser, Compiler::skip, Compiler::binary, Precedence::Comparison);
+    set(
+        Lesser,
+        Compiler::skip,
+        Compiler::binary,
+        Precedence::Comparison,
+    );
     set(
         LesserEqual,
         Compiler::skip,
@@ -107,7 +127,11 @@ impl<'src> Compiler<'src> {
 
     pub fn compile(&mut self, chunk: Chunk) -> bool {
         self.set_chunk(chunk);
-        self.expression();
+
+        while !self.parser.match_token(TokenType::Eof) {
+            self.declaration();
+        }
+
         self.end_compiler();
         !self.parser.had_error
     }
@@ -186,6 +210,38 @@ impl<'src> Compiler<'src> {
         }
     }
 
+    /// a program is a sequence of declarations
+    /// declaration <- classDecl
+    ///                varDecl
+    ///                funDecl
+    ///                statement
+    fn declaration(&mut self) {
+        self.statement();
+    }
+
+    /// statement <- exprStmt
+    ///              printStmt
+    fn statement(&mut self) {
+        if self.parser.match_token(TokenType::Print) {
+            self.print_statement();
+        } else {
+            self.expression_statement();
+        }
+    }
+
+    fn print_statement(&mut self) {
+        self.expression();
+        self.parser
+            .consume(TokenType::Semicolon, "Expected ';' after print statement.");
+        self.emit_opcode(Opcode::Print);
+    }
+
+    fn expression_statement(&mut self) {
+        self.expression();
+        self.parser
+            .consume(TokenType::Semicolon, "Expected ';' after expression.");
+    }
+
     fn number(&mut self) {
         let value = self
             .parser
@@ -200,7 +256,7 @@ impl<'src> Compiler<'src> {
     fn string(&mut self) {
         let lexeme = &self.parser.previous.lexeme;
         let length = lexeme.len();
-        let value = &lexeme[1..length-1].to_owned();
+        let value = &lexeme[1..length - 1].to_owned();
 
         self.emit_const(Value::String(value.to_owned()));
     }
@@ -241,17 +297,17 @@ impl<'src> Compiler<'src> {
             TokenType::BangEqual => {
                 self.emit_opcode(Opcode::Equal);
                 self.emit_opcode(Opcode::Not);
-            },
+            }
             TokenType::Greater => self.emit_opcode(Opcode::Greater),
             TokenType::Lesser => self.emit_opcode(Opcode::Lesser),
             TokenType::GreaterEqual => {
                 self.emit_opcode(Opcode::Lesser);
                 self.emit_opcode(Opcode::Not);
-            },
+            }
             TokenType::LesserEqual => {
                 self.emit_opcode(Opcode::Greater);
                 self.emit_opcode(Opcode::Not);
-            },
+            }
             TokenType::And => self.emit_opcode(Opcode::And),
             TokenType::Or => self.emit_opcode(Opcode::Or),
             _ => panic!("Invalid binary operator token {:?}", op_type),

@@ -16,6 +16,8 @@ pub enum Opcode {
     Lesser,
     And,
     Or,
+    Print,
+    Pop,
     Invalid = 255,
 }
 
@@ -30,12 +32,12 @@ impl From<usize> for Opcode {
         use Opcode::*;
         let lookup_tbl = [
             Return, Constant, Negate, Add, Subtract, Multiply, Divide, Nil, True, False, Not,
-            Equal, Greater, Lesser, And, Or
+            Equal, Greater, Lesser, And, Or, Print, Pop,
         ];
         if v < lookup_tbl.len() {
             lookup_tbl[v]
         } else {
-            panic!("Invalid instruction byte {}", v);
+            panic!("Invalid instruction byte {}. If you're developing, perhaps you didn't update your lookup table?", v);
         }
     }
 }
@@ -53,7 +55,7 @@ impl Opcode {
         match self {
             Invalid => 0,
             Return | Negate | Add | Subtract | Multiply | Divide | Nil | True | False | Not
-            | Equal | Greater | Lesser | And | Or => 1,
+            | Equal | Greater | Lesser | And | Or | Print | Pop => 1,
             Constant => 2,
         }
     }

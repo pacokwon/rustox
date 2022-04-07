@@ -33,7 +33,7 @@ impl Chunk {
             Add | Subtract | Multiply | Divide |
             Nil | True | False |
             Not | Equal | Greater | Lesser |
-            And | Or => println!("{:?}", opcode),
+            And | Or | Print | Pop => println!("{:?}", opcode),
             Constant => {
                 let voff = self.read(offset + 1);
                 let constant = self.read_value(voff);

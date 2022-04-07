@@ -37,8 +37,6 @@ impl Vm {
             match opcode {
                 Opcode::Invalid => panic!("Invalid instruction."),
                 Opcode::Return => {
-                    let popped = self.pop();
-                    println!("Return: {}", popped);
                     return InterpretResult::Ok;
                 }
                 Opcode::Constant => {
@@ -129,6 +127,13 @@ impl Vm {
                     } else {
                         self.push(b);
                     }
+                },
+                Opcode::Print => {
+                    let v = self.pop();
+                    println!("{}", v);
+                },
+                Opcode::Pop => {
+                    self.pop();
                 },
             }
         }
