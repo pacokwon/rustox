@@ -133,7 +133,7 @@ impl<'src> Compiler<'src> {
         }
 
         self.end_compiler();
-        !self.parser.had_error
+        self.parser.had_error
     }
 
     pub fn set_chunk(&mut self, chunk: Chunk) {
@@ -217,6 +217,10 @@ impl<'src> Compiler<'src> {
     ///                statement
     fn declaration(&mut self) {
         self.statement();
+
+        if self.parser.panicking {
+            self.parser.synchronize();
+        }
     }
 
     /// statement <- exprStmt

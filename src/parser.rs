@@ -48,6 +48,28 @@ impl<'src> Parser<'src> {
         }
     }
 
+    pub fn synchronize(&mut self) {
+        while self.current.token_type != TokenType::Eof {
+            if self.previous.token_type == TokenType::Semicolon {
+                return;
+            }
+
+            match self.current.token_type {
+                TokenType::Class |
+                TokenType::For |
+                TokenType::Fun |
+                TokenType::If |
+                TokenType::Print |
+                TokenType::Return |
+                TokenType::Var |
+                TokenType::While => return,
+                _ => (),
+            }
+
+            self.advance();
+        }
+    }
+
     pub fn consume(&mut self, token_type: TokenType, message: &'static str) {
         if self.current.token_type == token_type {
             self.advance();
@@ -88,12 +110,12 @@ impl<'src> Parser<'src> {
             ErrorPoint::Previous => &mut self.previous,
         };
 
-        eprintln!("[line {}] Error", token.line);
+        eprint!("[line {}] Error", token.line);
 
         match token.token_type {
             TokenType::Eof => eprint!(" at end"),
             TokenType::Error => (),
-            _ => eprint!(" at {}", token.lexeme),
+            _ => eprint!(" at '{}'", token.lexeme),
         };
 
         eprintln!(": {}", message);
