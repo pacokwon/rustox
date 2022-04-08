@@ -18,6 +18,8 @@ pub enum Opcode {
     Or,
     Print,
     Pop,
+    DefineGlobal,
+    GetGlobal,
     Invalid = 255,
 }
 
@@ -32,7 +34,7 @@ impl From<usize> for Opcode {
         use Opcode::*;
         let lookup_tbl = [
             Return, Constant, Negate, Add, Subtract, Multiply, Divide, Nil, True, False, Not,
-            Equal, Greater, Lesser, And, Or, Print, Pop,
+            Equal, Greater, Lesser, And, Or, Print, Pop, DefineGlobal, GetGlobal
         ];
         if v < lookup_tbl.len() {
             lookup_tbl[v]
@@ -56,7 +58,7 @@ impl Opcode {
             Invalid => 0,
             Return | Negate | Add | Subtract | Multiply | Divide | Nil | True | False | Not
             | Equal | Greater | Lesser | And | Or | Print | Pop => 1,
-            Constant => 2,
+            Constant | DefineGlobal | GetGlobal => 2,
         }
     }
 }

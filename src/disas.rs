@@ -34,7 +34,7 @@ impl Chunk {
             Nil | True | False |
             Not | Equal | Greater | Lesser |
             And | Or | Print | Pop => println!("{:?}", opcode),
-            Constant => {
+            Constant | DefineGlobal | GetGlobal => {
                 let voff = self.read(offset + 1);
                 let constant = self.read_value(voff);
                 println!("{:<16} {:<4} '{}'", format!("{:?}", opcode), voff, constant);

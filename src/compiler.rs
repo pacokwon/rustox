@@ -3,6 +3,7 @@ use crate::opcode::{Opcode, Precedence};
 use crate::parser::Parser;
 use crate::token::TokenType;
 use crate::value::Value;
+use std::rc::Rc;
 
 pub struct Compiler<'src> {
     parser: Parser<'src>,
@@ -85,7 +86,7 @@ fn init_rules<'src>() -> Vec<ParseRule<'src>> {
         Precedence::Comparison,
     );
 
-    set(Identifier, Compiler::skip, Compiler::skip, Precedence::None);
+    set(Identifier, Compiler::variable, Compiler::skip, Precedence::None);
     set(String, Compiler::string, Compiler::skip, Precedence::None);
     set(Number, Compiler::number, Compiler::skip, Precedence::None);
 
@@ -216,11 +217,30 @@ impl<'src> Compiler<'src> {
     ///                funDecl
     ///                statement
     fn declaration(&mut self) {
-        self.statement();
+        if self.parser.match_token(TokenType::Var) {
+            self.variable_declaration();
+        } else {
+            self.statement();
+        }
 
         if self.parser.panicking {
             self.parser.synchronize();
         }
+    }
+
+    fn variable_declaration(&mut self) {
+        self.parser.consume(TokenType::Identifier, "Expected variable name.");
+        let ident = self.parser.previous.lexeme.to_owned();
+        let value_index = self.make_const(Value::Ident(Rc::new(ident)));
+
+        if self.parser.match_token(TokenType::Equal) {
+            self.expression();
+        } else {
+            self.emit_opcode(Opcode::Nil);
+        }
+        self.parser.consume(TokenType::Semicolon, "Expected ';' after variable declaration");
+
+        self.define_variable(value_index);
     }
 
     /// statement <- exprStmt
@@ -262,7 +282,7 @@ impl<'src> Compiler<'src> {
         let length = lexeme.len();
         let value = &lexeme[1..length - 1].to_owned();
 
-        self.emit_const(Value::String(value.to_owned()));
+        self.emit_const(Value::String(Rc::new(value.to_owned())));
     }
 
     fn expression(&mut self) {
@@ -328,6 +348,16 @@ impl<'src> Compiler<'src> {
         }
     }
 
+    fn variable(&mut self) {
+        let ident = self.parser.previous.lexeme.to_owned();
+        let value_index = self.make_const(Value::Ident(Rc::new(ident)));
+        self.emit_two(Opcode::GetGlobal, value_index);
+    }
+
     /// dummy parse function for doing nothing
     fn skip(&mut self) {}
+
+    fn define_variable(&mut self, global: u8) {
+        self.emit_two(Opcode::DefineGlobal, global);
+    }
 }

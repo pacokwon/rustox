@@ -3,11 +3,14 @@ use std::{
     ops::{Add, Div, Mul, Neg, Not, Sub},
 };
 
+use std::rc::Rc;
+
 #[derive(Debug, Clone)]
 pub enum Value {
     Number(f64),
     Bool(bool),
-    String(String),
+    String(Rc<String>),
+    Ident(Rc<String>),
     Nil,
 }
 
@@ -29,6 +32,7 @@ impl Display for Value {
             Self::Nil => write!(f, "Nil"),
             Self::Bool(true) => write!(f, "True"),
             Self::Bool(false) => write!(f, "False"),
+            Self::Ident(ref ident) => write!(f, "@{}", ident),
         }
     }
 }
@@ -50,9 +54,9 @@ impl Add for Value {
     fn add(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Self::Number(l), Self::Number(r)) => Self::Number(l + r),
-            (Self::Number(l), Self::String(r)) => Self::String(format!("{}{}", l, r)),
-            (Self::String(l), Self::Number(r)) => Self::String(format!("{}{}", l, r)),
-            (Self::String(l), Self::String(r)) => Self::String(l + &r),
+            (Self::Number(l), Self::String(ref r)) => Self::String(Rc::new(format!("{}{}", l, r))),
+            (Self::String(ref l), Self::Number(r)) => Self::String(Rc::new(format!("{}{}", l, r))),
+            (Self::String(ref l), Self::String(ref r)) => Self::String(Rc::new(format!("{}{}", l, r))),
             (l, r) => panic!("Expected Number. Encountered {} and {}", l, r),
         }
     }

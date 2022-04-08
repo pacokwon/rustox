@@ -1,9 +1,12 @@
 use crate::{chunk::Chunk, opcode::Opcode, value::Value};
+use std::collections::HashMap;
+use std::rc::Rc;
 
 pub struct Vm {
     chunk: Option<Chunk>,
     pub stack: Vec<Value>,
     pc: usize,
+    globals: HashMap<Rc<String>, Value>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,7 +21,8 @@ impl Vm {
         let chunk = None;
         let pc = 0;
         let stack = Vec::new();
-        Vm { chunk, pc, stack }
+        let globals = HashMap::new();
+        Vm { chunk, pc, stack, globals }
     }
 
     fn current_chunk(&mut self) -> &mut Chunk {
@@ -135,6 +139,29 @@ impl Vm {
                 Opcode::Pop => {
                     self.pop();
                 },
+                Opcode::DefineGlobal => {
+                    let value = self.peek(0).clone();
+                    let ident = self.read_constant().clone();
+
+                    match ident {
+                        Value::Ident(ident) => self.globals.insert(ident, value),
+                        _ => panic!("The left hand side of a global assignment should be a variable."),
+                    };
+                },
+                Opcode::GetGlobal => {
+                    let ident = self.read_constant().clone();
+
+                    match ident {
+                        Value::Ident(ref ident) => {
+                            let val = match self.globals.get(ident) {
+                                Some(v) => v.clone(),
+                                None => panic!("Variable {} empty in globals table.", ident),
+                            };
+                            self.push(val);
+                        },
+                        _ => panic!("Accessing a global variable is only possible with a variable."),
+                    }
+                }
             }
         }
     }
@@ -168,6 +195,10 @@ impl Vm {
         let b = self.pop();
         let a = self.pop();
         (a, b)
+    }
+
+    fn peek(&self, distance: usize) -> &Value {
+        &self.stack[self.stack.len() - 1 - distance]
     }
 }
 

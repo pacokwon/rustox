@@ -412,4 +412,11 @@ mod tests {
         let expected = vec![True, Or, True, And, False];
         test_code(code, expected);
     }
+
+    #[test]
+    fn global() {
+        let code = r#"var beverage = "cafe au lait";"#;
+        let expected = vec![Var, Identifier, Equal, String, Semicolon];
+        test_code(code, expected);
+    }
 }
